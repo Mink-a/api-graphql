@@ -1,0 +1,39 @@
+const { findByIdAndDelete } = require("./models/Post.models");
+const Post = require("./models/Post.models");
+
+const resolvers = {
+  Query: {
+    hello: () => "helo world",
+    getAllPosts: async () => {
+      return await Post.find();
+    },
+    getPost: async (_parent, { id }, _contex, _info) => {
+      return await Post.findById(id);
+    },
+  },
+  Mutation: {
+    createPost: async (parent, args, contex, info) => {
+      const { title, description } = args.post;
+      const post = new Post({ title, description });
+      await post.save();
+      return post;
+    },
+    deletePost: async (parent, args, contex, info) => {
+      const { id } = args;
+      await Post.findByIdAndDelete(id);
+      return "OK Post Deleted!!";
+    },
+    updatePost: async (parent, args, contex, info) => {
+      const { id } = args;
+      const { title, description } = args.post;
+      const post = await Post.findByIdAndUpdate(
+        id,
+        { title, description },
+        { new: true }
+      );
+      return post;
+    },
+  },
+};
+
+module.exports = resolvers;
